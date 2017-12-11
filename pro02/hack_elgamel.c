@@ -4,15 +4,24 @@
 #include <stdint.h>
 #include <math.h>
 
-const uint64_t n = 18444164967047483891ULL;
-const uint64_t e = 29ULL;
-const uint64_t C = 21ULL;
+// PUBLIC
+const uint32_t q = 1605333871;
+const uint32_t a = 43;
 
-static bool canDivide(uint64_t dividend, uint64_t divisor) {
+// GIVEN
+// A's pub key
+const uint32_t y_A = 22;
+// B's pub key
+const uint32_t C1 = 187341129;
+// encrypted M
+const uint32_t C2 = 881954783;
+
+
+static bool canDivide(uint32_t dividend, uint32_t divisor) {
   return !(dividend % divisor);
 }
 
-static bool isPrime(uint64_t n) {
+static bool isPrime(uint32_t n) {
   int i;
   bool ret = true;
 
@@ -30,13 +39,13 @@ static bool isPrime(uint64_t n) {
 // and a > b
 // return y when r = 1
 // return 0 when a, b are not relative prime
-static uint64_t getEEA(uint64_t a, uint64_t b) {
-  uint64_t big = (a > b)? a : b;
-  uint64_t small = (a > b)? b : a;
+static uint32_t getEEA(uint32_t a, uint32_t b) {
+  uint32_t big = (a > b)? a : b;
+  uint32_t small = (a > b)? b : a;
 
-  uint64_t q;
-  uint64_t r;
-  uint64_t aa, bb, rr;
+  uint32_t q;
+  uint32_t r;
+  uint32_t aa, bb, rr;
   // VAR USAGE:
   // x         y         r          q
   //==================================
@@ -49,8 +58,8 @@ static uint64_t getEEA(uint64_t a, uint64_t b) {
   r = a;
   rr = bb;
 
-  uint64_t ret = 0;
-  uint64_t tmp;
+  uint32_t ret = 0;
+  uint32_t tmp;
 
   while (!ret) {
     q = r / rr;
@@ -76,31 +85,41 @@ static uint64_t getEEA(uint64_t a, uint64_t b) {
   return ret;
 }
 
+// pow function with modulo
+// return a^e mod m
+static uint32_t powMod(uint32_t a, uint32_t e, uint32_t m) {
+  return (uint64_t)pow(a, e) % m;
+}
+
 int main() {
-  uint64_t p, q;
-  uint64_t d;
+  // A's private key
+  uint32_t x_A;
+  // B's private key
+  uint32_t k;
+  // masking key
+  uint32_t K;
 
-  uint64_t i, tmp;
+  uint32_t i, tmp;
 
+  // factor A's private key
+  for (i = 2; i < q - 1; i++) {
+    printf("Doing... %d\n", i);
 
-  // factor n (find p & q)
-  for (i = 2; i < sqrt(n); i++) {
-    printf("Doing... %lld\n", (long long unsigned int)i);
-    if (isPrime(i) && canDivide(n, i)) {
-      p = i;
-      q = n / i;
-      printf("*** FOUND p & q:\n");
-      printf("p: %lld\n q:%lld\n",
-        (long long unsigned int)p, (long long unsigned int)q);
+    if (powMod(a, i, q) == y_A) {
+      x_A = i;
+      // get masking key by C1^x_A
+      K = powMod(C1, x_A, q);
+
+      printf("*** FOUND x_A & K:\n");
+      printf("x_A: %d\n K:%d\n", x_A, K);
       break;
     }
   }
 
-  // phi(n)
-  tmp = (p-1) * (q-1);
-  d = getEEA(tmp, e);
+  // get inverse of K
+  tmp = getEEA(K, q);
 
-  printf("Original Message is: %lf", pow(C, d));
+  printf("Original Message is: %d", (uint32_t)((uint64_t)C2 * (uint64_t)tmp % q));
 
   return 0;
 }
