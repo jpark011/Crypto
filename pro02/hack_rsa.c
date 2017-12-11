@@ -76,6 +76,12 @@ static uint64_t getEEA(uint64_t a, uint64_t b) {
   return ret;
 }
 
+// pow function with modulo
+// return a^e mod m
+static uint64_t powMod(uint64_t a, uint64_t e, uint64_t m) {
+  return (uint64_t)pow(a, e) % m;
+}
+
 int main() {
   uint64_t p, q;
   uint64_t d;
@@ -100,7 +106,7 @@ int main() {
   tmp = (p-1) * (q-1);
   d = getEEA(tmp, e);
 
-  printf("Original Message is: %lf", pow(C, d));
+  printf("Original Message is: %lld", (long long unsigned int)powMod(C, d, n));
 
   return 0;
 }
