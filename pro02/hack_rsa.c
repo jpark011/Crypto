@@ -18,9 +18,9 @@ static bool isPrime(uint64_t n) {
   bool ret = true;
 
   // for faster
-  if (n % 2 == 0) return false;
-
-  for (i = 2; i < limit; i++) {
+  if (n != 2 && n % 2 == 0) return false;
+  // printf("n: %lld\n", (long long unsigned int)n);
+  for (i = 2; i <= limit; i++) {
     if (canDivide(n, i)) {
       ret = false;
       break;
@@ -115,6 +115,26 @@ static uint64_t powMod(uint64_t a, uint64_t e, uint64_t m) {
   // return x * y % m;
 }
 
+// multiplication function with modulo
+// return x * y mod m
+static uint64_t multMod(uint64_t x, uint64_t y, uint64_t m) {
+  return
+    (y == 0)?   0 :
+    (y & 1)?    (multMod((x * 2) % m, y/2, m) + x) % m :
+                multMod((x * 2) % m, y/2, m) % m;
+  uint64_t ret = 1;
+
+  while (0 < y) {
+    if (y & 1) {
+      ret = (ret * x) % m;
+    }
+    x = (x * x) % m;
+    y >>= 1;
+  }
+
+  return ret;
+}
+
 int main() {
   uint64_t p, q;
   uint64_t d;
@@ -125,7 +145,7 @@ int main() {
   tmp = (uint64_t)sqrt(n);
   printf("limit: %lld", (long long unsigned int)tmp);
   // factor n (find p & q)
-  for (i = 2; i < tmp; i++) {
+  for (i = tmp; i >= 2; i--) {
     printf("Doing... %lld\n", (long long unsigned int)i);
     if (canDivide(n, i) && isPrime(i)) {
       p = i;
@@ -137,11 +157,14 @@ int main() {
     }
   }
 
+  // printf("Are they prime?? %d\n", isPrime(p) && isPrime(q));
+
   // phi(n)
-  tmp = (p-1) * (q-1);
+  tmp = (p -1) * (q - 1);// multMod(p-1, q-1, n);
+  printf("Phi(n) %llu\n", (long long unsigned int)tmp);
   d = getEEA(tmp, e);
 
-  printf("Original Message is: %lld", (long long unsigned int)powMod(C, d, n));
+  printf("Original Message is: %llu\n", (long long unsigned int)powMod(C, d, n));
 
   return 0;
 }

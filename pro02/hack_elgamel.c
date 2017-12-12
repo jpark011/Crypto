@@ -27,9 +27,9 @@ static bool isPrime(uint32_t n) {
   bool ret = true;
 
   // for faster
-  if (n % 2 == 0) return false;
+  if (n != 2 && n % 2 == 0) return false;
 
-  for (i = 2; i < limit; i++) {
+  for (i = 2; i <= limit; i++) {
     if (canDivide(n, i)) {
       ret = false;
       break;
@@ -151,7 +151,7 @@ int main() {
   // get inverse of K
   tmp = getEEA(K, q);
 
-  printf("Original Message is: %d", (uint32_t)((uint64_t)C2 * (uint64_t)tmp % q));
+  printf("Original Message is: %d\n", (uint32_t)((uint64_t)C2 * (uint64_t)tmp % q));
 
   return 0;
 }
