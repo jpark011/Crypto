@@ -127,7 +127,7 @@ int main() {
   // factor n (find p & q)
   for (i = 2; i < tmp; i++) {
     printf("Doing... %lld\n", (long long unsigned int)i);
-    if (isPrime(i) && canDivide(n, i)) {
+    if (canDivide(n, i) && isPrime(i)) {
       p = i;
       q = n / i;
       printf("*** FOUND p & q:\n");
