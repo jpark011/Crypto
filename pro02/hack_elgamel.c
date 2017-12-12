@@ -22,13 +22,14 @@ static bool canDivide(uint32_t dividend, uint32_t divisor) {
 }
 
 static bool isPrime(uint32_t n) {
-  int i;
+  uint32_t i;
+  uint32_t limit = sqrt(n);
   bool ret = true;
 
   // for faster
   if (n % 2 == 0) return false;
 
-  for (i = 2; i < sqrt(n); i++) {
+  for (i = 2; i < limit; i++) {
     if (canDivide(n, i)) {
       ret = false;
       break;

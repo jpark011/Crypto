@@ -13,13 +13,14 @@ static bool canDivide(uint64_t dividend, uint64_t divisor) {
 }
 
 static bool isPrime(uint64_t n) {
-  int i;
+  uint64_t i;
+  uint64_t limit = sqrt(n);
   bool ret = true;
 
   // for faster
   if (n % 2 == 0) return false;
 
-  for (i = 2; i < sqrt(n); i++) {
+  for (i = 2; i < limit; i++) {
     if (canDivide(n, i)) {
       ret = false;
       break;
@@ -120,9 +121,11 @@ int main() {
 
   uint64_t i, tmp;
 
-
+  // for efficiency
+  tmp = (uint64_t)sqrt(n);
+  printf("limit: %lld", (long long unsigned int)tmp);
   // factor n (find p & q)
-  for (i = 2; i < sqrt(n); i++) {
+  for (i = 2; i < tmp; i++) {
     printf("Doing... %lld\n", (long long unsigned int)i);
     if (isPrime(i) && canDivide(n, i)) {
       p = i;
