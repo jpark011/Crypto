@@ -16,6 +16,9 @@ static bool isPrime(uint64_t n) {
   int i;
   bool ret = true;
 
+  // for faster
+  if (n % 2 == 0) return false;
+
   for (i = 2; i < sqrt(n); i++) {
     if (canDivide(n, i)) {
       ret = false;
@@ -79,7 +82,36 @@ static uint64_t getEEA(uint64_t a, uint64_t b) {
 // pow function with modulo
 // return a^e mod m
 static uint64_t powMod(uint64_t a, uint64_t e, uint64_t m) {
-  return (uint64_t)pow(a, e) % m;
+  // return  (e == 0)? 1 :
+  //         (e%2 == 0)? powMod(a, e/2, m) * powMod(a, e/2, m) % m:
+  //         a * powMod(a, e/2, m) * powMod(a, e/2, m) % m;
+  uint32_t i = e;
+  uint64_t x = a;
+  uint64_t ret = 1;
+
+  while (0 < i) {
+    if (i & 1) {
+      ret = (ret * x) % m;
+    }
+    x = (x * x) % m;
+    i >>= 1;
+  }
+
+  return ret;
+
+  // while (1 < i) {
+  //   // odd
+  //   if (i%2 != 0) {
+  //     y = x * y;
+  //     y = y % m;
+  //   }
+  //   x = x * x;
+  //   x = x % m;
+  //   i /= 2;
+  // }
+  //
+  // printf("%d\n", x * y);
+  // return x * y % m;
 }
 
 int main() {
@@ -90,7 +122,7 @@ int main() {
 
 
   // factor n (find p & q)
-  for (i = 107232100; i < sqrt(n); i++) {
+  for (i = 2; i < sqrt(n); i++) {
     printf("Doing... %lld\n", (long long unsigned int)i);
     if (isPrime(i) && canDivide(n, i)) {
       p = i;

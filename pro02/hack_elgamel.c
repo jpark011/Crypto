@@ -25,6 +25,9 @@ static bool isPrime(uint32_t n) {
   int i;
   bool ret = true;
 
+  // for faster
+  if (n % 2 == 0) return false;
+
   for (i = 2; i < sqrt(n); i++) {
     if (canDivide(n, i)) {
       ret = false;
@@ -88,7 +91,36 @@ static uint32_t getEEA(uint32_t a, uint32_t b) {
 // pow function with modulo
 // return a^e mod m
 static uint32_t powMod(uint32_t a, uint32_t e, uint32_t m) {
-  return (uint64_t)pow(a, e) % m;
+  // return  (e == 0)? 1 :
+  //         (e%2 == 0)? powMod(a, e/2, m) * powMod(a, e/2, m) % m:
+  //         a * powMod(a, e/2, m) * powMod(a, e/2, m) % m;
+  uint32_t i = e;
+  uint64_t x = a;
+  uint64_t ret = 1;
+
+  while (0 < i) {
+    if (i & 1) {
+      ret = (ret * x) % m;
+    }
+    x = (x * x) % m;
+    i >>= 1;
+  }
+
+  return ret;
+
+  // while (1 < i) {
+  //   // odd
+  //   if (i%2 != 0) {
+  //     y = x * y;
+  //     y = y % m;
+  //   }
+  //   x = x * x;
+  //   x = x % m;
+  //   i /= 2;
+  // }
+  //
+  // printf("%d\n", x * y);
+  // return x * y % m;
 }
 
 int main() {
@@ -104,7 +136,6 @@ int main() {
   // factor A's private key
   for (i = 2; i < q - 1; i++) {
     printf("Doing... %d\n", i);
-
     if (powMod(a, i, q) == y_A) {
       x_A = i;
       // get masking key by C1^x_A
